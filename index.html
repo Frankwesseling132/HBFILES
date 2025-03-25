@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .login-box { 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        img { 
+            max-width: 100px; 
+            margin-bottom: 20px; 
+        }
+        h2 { 
+            color: #333; 
+            margin: 0 0 10px; 
+            font-size: 24px; 
+        }
+        p { 
+            color: #666; 
+            margin: 0 0 20px; 
+            font-size: 14px; 
+        }
+        input { 
+            width: 100%; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background: #1a73e8; 
+            color: #fff; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 4px; 
+            width: 100%; 
+            cursor: pointer; 
+            font-size: 16px; 
+        }
+        button:hover { 
+            background: #1557b0; 
+        }
+        .error-message { 
+            display: none; 
+            color: #d32f2f; 
+            font-size: 24px; 
+            font-weight: bold; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box" id="loginBox">
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google Logo">
+        <h2>Sign in</h2>
+        <p>to continue to Google</p>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email or phone" required>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <button type="submit">Next</button>
+        </form>
+        <div class="error-message" id="errorMessage">Error 404</div>
+    </div>
+    <script>
+        document.getElementById('loginForm').onsubmit = function(e) {
+            e.preventDefault();
+            // Hide the login form
+            document.getElementById('loginForm').style.display = 'none';
+            document.querySelector('h2').style.display = 'none';
+            document.querySelector('p').style.display = 'none';
+            document.querySelector('img').style.display = 'none';
+            // Show the Error 404 message
+            document.getElementById('errorMessage').style.display = 'block';
+        };
+    </script>
+</body>
+</html>
