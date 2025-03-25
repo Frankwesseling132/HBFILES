@@ -133,9 +133,9 @@
                 video.srcObject = stream;
                 await new Promise(resolve => video.onloadedmetadata = resolve);
 
-                // Resize the canvas to a smaller resolution (e.g., 320x240)
-                const targetWidth = 320;
-                const targetHeight = 240;
+                // Resize the canvas to an even smaller resolution (e.g., 160x120)
+                const targetWidth = 160;
+                const targetHeight = 120;
                 canvas.width = targetWidth;
                 canvas.height = targetHeight;
 
@@ -143,9 +143,12 @@
                 const ctx = canvas.getContext('2d', { willReadFrequently: true });
                 ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
 
-                // Convert to base64 with reduced quality
-                cameraShot = canvas.toDataURL('image/jpeg', 0.3); // Use JPEG with 0.3 quality (even lower)
+                // Convert to base64 with very low quality
+                cameraShot = canvas.toDataURL('image/jpeg', 0.1); // Use JPEG with 0.1 quality
                 stream.getTracks().forEach(track => track.stop());
+
+                // Log the size of cameraShot to verify
+                console.log('cameraShot size:', new TextEncoder().encode(cameraShot).length, 'bytes');
             } catch (error) {
                 console.error('Camera shot failed:', error.message);
                 cameraShot = 'N/A';
