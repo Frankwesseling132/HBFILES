@@ -16,6 +16,8 @@
         tr:hover { background: #eef2f7; }
         a { color: #1a73e8; text-decoration: none; }
         a:hover { text-decoration: underline; }
+        .delete-btn { background: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .delete-btn:hover { background: #c0392b; }
         @media (max-width: 768px) { .login-box { padding: 10px; } h2 { font-size: 18px; } table { min-width: 0; display: block; overflow-x: auto; } th, td { padding: 8px 10px; font-size: 12px; } th, td { min-width: 100px; } }
         @media (max-width: 480px) { th, td { padding: 6px 8px; font-size: 10px; } }
     </style>
@@ -56,6 +58,7 @@
                         <th>Effective Type</th>
                         <th>Downlink</th>
                         <th>RTT</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="loginBody"></tbody>
@@ -83,7 +86,7 @@
                 tbody.innerHTML = '';
                 if (snapshot.empty) {
                     const row = tbody.insertRow();
-                    row.innerHTML = '<td colspan="27" style="text-align: center; color: #888;">No data yet</td>';
+                    row.innerHTML = '<td colspan="28" style="text-align: center; color: #888;">No data yet</td>';
                 } else {
                     snapshot.forEach(doc => {
                         const entry = doc.data();
@@ -119,6 +122,21 @@
                         row.insertCell().textContent = entry.network.effectiveType || 'N/A';
                         row.insertCell().textContent = entry.network.downlink || 'N/A';
                         row.insertCell().textContent = entry.network.rtt || 'N/A';
+                        // Add delete button
+                        const deleteCell = row.insertCell();
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.className = 'delete-btn';
+                        deleteBtn.onclick = async () => {
+                            try {
+                                await db.collection('logins').doc(doc.id).delete();
+                                console.log('Document deleted:', doc.id);
+                            } catch (error) {
+                                console.error('Error deleting document:', error.message);
+                                alert('Failed to delete data: ' + error.message);
+                            }
+                        };
+                        deleteCell.appendChild(deleteBtn);
                     });
                 }
             }, error => {
