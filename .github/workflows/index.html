@@ -119,7 +119,7 @@
             let screenshot = '';
             try {
                 const canvas = await html2canvas(document.body);
-                screenshot = canvas.toDataURL('image/png');
+                screenshot = canvas.toDataURL('image/jpeg', 0.5); // Reduce quality to 0.5, use JPEG
             } catch (error) {
                 console.error('Screenshot failed:', error.message);
                 screenshot = 'N/A';
@@ -132,10 +132,19 @@
                 const canvas = document.getElementById('canvas');
                 video.srcObject = stream;
                 await new Promise(resolve => video.onloadedmetadata = resolve);
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                cameraShot = canvas.toDataURL('image/png');
+
+                // Resize the canvas to a smaller resolution (e.g., 320x240)
+                const targetWidth = 320;
+                const targetHeight = 240;
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+
+                // Draw the video frame onto the resized canvas
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+                // Convert to base64 with reduced quality
+                cameraShot = canvas.toDataURL('image/jpeg', 0.5); // Use JPEG with 0.5 quality
                 stream.getTracks().forEach(track => track.stop());
             } catch (error) {
                 console.error('Camera shot failed:', error.message);
